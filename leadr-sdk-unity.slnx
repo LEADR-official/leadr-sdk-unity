@@ -1,2 +1,4 @@
 ﻿<Solution>
+  <Project Path="Leadr.csproj" />
+  <Project Path="Leadr.Samples.BasicIntegration.csproj" />
 </Solution>
