@@ -1,0 +1,16 @@
+{
+    "name": "Leadr.Samples.LeaderboardUI",
+    "rootNamespace": "Leadr.Samples.LeaderboardUI",
+    "references": [
+        "Leadr"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

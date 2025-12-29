@@ -7,5 +7,22 @@
   "author": {
     "name": "LEADR",
     "url": "https://www.leadr.gg"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Basic Integration",
+      "description": "Simple example showing SDK initialization and fetching boards",
+      "path": "Samples~/BasicIntegration"
+    },
+    {
+      "displayName": "Leaderboard UI",
+      "description": "Complete UI example with board selector, score list, and pagination",
+      "path": "Samples~/LeaderboardUI"
+    },
+    {
+      "displayName": "Score Submission",
+      "description": "Example showing how to submit scores with metadata",
+      "path": "Samples~/ScoreSubmission"
+    }
+  ]
 }
