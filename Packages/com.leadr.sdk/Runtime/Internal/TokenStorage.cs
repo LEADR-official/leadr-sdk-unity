@@ -1,4 +1,6 @@
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
 
 namespace Leadr.Internal
@@ -15,11 +17,35 @@ namespace Leadr.Internal
             var fingerprint = PlayerPrefs.GetString(FingerprintKey, null);
             if (string.IsNullOrEmpty(fingerprint))
             {
-                fingerprint = Guid.NewGuid().ToString();
+                fingerprint = GenerateFingerprint();
                 PlayerPrefs.SetString(FingerprintKey, fingerprint);
                 PlayerPrefs.Save();
             }
             return fingerprint;
+        }
+
+        private static string GenerateFingerprint()
+        {
+            // Combine stable device signals for fingerprinting
+            // See: https://docs.leadr.gg/latest/api/client-api/#authentication
+            var raw = string.Join("|",
+                Application.platform.ToString(),
+                SystemInfo.deviceUniqueIdentifier,
+                SystemInfo.graphicsDeviceName,
+                SystemInfo.processorType,
+                SystemInfo.systemMemorySize.ToString()
+            );
+
+            // SHA256 hash → 64 lowercase hex characters
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(raw);
+                var hash = sha256.ComputeHash(bytes);
+                var sb = new StringBuilder(64);
+                foreach (var b in hash)
+                    sb.Append(b.ToString("x2"));
+                return sb.ToString();
+            }
         }
 
         public static void SaveTokens(string accessToken, string refreshToken, DateTime expiresAt)
