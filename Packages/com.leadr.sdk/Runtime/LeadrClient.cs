@@ -287,6 +287,10 @@ namespace Leadr
         /// <param name="boardId">The board ID (e.g., "brd_abc123...").</param>
         /// <param name="score">The score value.</param>
         /// <param name="playerName">The player's display name (required).</param>
+        /// <param name="valueDisplay">
+        /// Optional formatted display string (e.g., "1:23.45" for time, "1,234 points").
+        /// If not provided, clients should fall back to formatting the raw score value.
+        /// </param>
         /// <param name="metadata">
         /// Optional custom metadata (max 1KB). Can include game state, achievements,
         /// platform info, or any JSON-serializable data.
@@ -304,13 +308,14 @@ namespace Leadr
         ///     { "difficulty", "hard" }
         /// };
         /// var result = await LeadrClient.Instance.SubmitScoreAsync(
-        ///     "brd_abc123", 1000, "PlayerOne", metadata);
+        ///     "brd_abc123", 1000, "PlayerOne", "1,000 pts", metadata);
         /// </code>
         /// </example>
         public async Task<LeadrResult<Score>> SubmitScoreAsync(
             string boardId,
             long score,
             string playerName,
+            string valueDisplay = null,
             Dictionary<string, object> metadata = null)
         {
             EnsureInitialized();
@@ -331,6 +336,11 @@ namespace Leadr
                 { "value", score },
                 { "player_name", playerName }
             };
+
+            if (!string.IsNullOrEmpty(valueDisplay))
+            {
+                body["value_display"] = valueDisplay;
+            }
 
             if (metadata != null)
             {
