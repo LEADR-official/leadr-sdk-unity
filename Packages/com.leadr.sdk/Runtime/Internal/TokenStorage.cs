@@ -5,21 +5,21 @@ namespace Leadr.Internal
 {
     internal static class TokenStorage
     {
-        private const string DeviceIdKey = "leadr_device_id";
+        private const string FingerprintKey = "leadr_client_fingerprint";
         private const string AccessTokenKey = "leadr_access_token";
         private const string RefreshTokenKey = "leadr_refresh_token";
         private const string ExpiresAtKey = "leadr_token_expires_at";
 
-        public static string GetOrCreateDeviceId()
+        public static string GetOrCreateFingerprint()
         {
-            var deviceId = PlayerPrefs.GetString(DeviceIdKey, null);
-            if (string.IsNullOrEmpty(deviceId))
+            var fingerprint = PlayerPrefs.GetString(FingerprintKey, null);
+            if (string.IsNullOrEmpty(fingerprint))
             {
-                deviceId = Guid.NewGuid().ToString();
-                PlayerPrefs.SetString(DeviceIdKey, deviceId);
+                fingerprint = Guid.NewGuid().ToString();
+                PlayerPrefs.SetString(FingerprintKey, fingerprint);
                 PlayerPrefs.Save();
             }
-            return deviceId;
+            return fingerprint;
         }
 
         public static void SaveTokens(string accessToken, string refreshToken, DateTime expiresAt)
@@ -82,7 +82,7 @@ namespace Leadr.Internal
 
         public static void ClearAll()
         {
-            PlayerPrefs.DeleteKey(DeviceIdKey);
+            PlayerPrefs.DeleteKey(FingerprintKey);
             ClearTokens();
         }
     }

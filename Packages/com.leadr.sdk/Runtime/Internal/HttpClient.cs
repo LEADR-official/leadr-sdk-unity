@@ -69,7 +69,7 @@ namespace Leadr.Internal
 
                 if (debugLogging)
                 {
-                    LogRequest(method, url, headers);
+                    LogRequest(method, url, jsonBody);
                 }
 
                 var operation = request.SendWebRequest();
@@ -77,46 +77,71 @@ namespace Leadr.Internal
                     await Task.Yield();
 
                 var elapsed = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                var responseBody = request.downloadHandler?.text;
                 var response = new HttpResponse(
                     (int)request.responseCode,
-                    request.downloadHandler?.text,
+                    responseBody,
                     request.result == UnityWebRequest.Result.Success ||
                     request.result == UnityWebRequest.Result.ProtocolError);
 
                 if (debugLogging)
                 {
-                    LogResponse(response.StatusCode, elapsed, request.result);
+                    LogResponse(response.StatusCode, elapsed, request.result, responseBody);
                 }
 
                 return response;
             }
         }
 
-        private void LogRequest(string method, string url, Dictionary<string, string> headers)
+        private void LogRequest(string method, string url, string jsonBody)
         {
-            var uri = new Uri(url);
-            var sanitizedHeaders = new List<string>();
-            if (headers != null)
+            var logMessage = $"[LEADR] → {method} {url}";
+
+            if (!string.IsNullOrEmpty(jsonBody))
             {
-                foreach (var h in headers)
-                {
-                    if (h.Key.ToLowerInvariant().Contains("authorization"))
-                        sanitizedHeaders.Add($"{h.Key}: [REDACTED]");
-                    else if (h.Key.ToLowerInvariant().Contains("nonce"))
-                        sanitizedHeaders.Add($"{h.Key}: [REDACTED]");
-                    else
-                        sanitizedHeaders.Add($"{h.Key}: {h.Value}");
-                }
+                // Sanitize sensitive fields from request body
+                var sanitizedBody = SanitizeJsonForLogging(jsonBody);
+                logMessage += $"\n  Body: {sanitizedBody}";
             }
 
-            var headerStr = sanitizedHeaders.Count > 0 ? $" ({string.Join(", ", sanitizedHeaders)})" : "";
-            Debug.Log($"[LEADR] {method} {uri.PathAndQuery}{headerStr}");
+            Debug.Log(logMessage);
         }
 
-        private void LogResponse(int statusCode, double elapsedMs, UnityWebRequest.Result result)
+        private void LogResponse(int statusCode, double elapsedMs, UnityWebRequest.Result result, string responseBody)
         {
             var status = statusCode > 0 ? statusCode.ToString() : result.ToString();
-            Debug.Log($"[LEADR] {status} ({elapsedMs:F0}ms)");
+            var logMessage = $"[LEADR] ← {status} ({elapsedMs:F0}ms)";
+
+            if (!string.IsNullOrEmpty(responseBody))
+            {
+                // Truncate long responses and sanitize tokens
+                var sanitizedBody = SanitizeJsonForLogging(responseBody);
+                if (sanitizedBody.Length > 500)
+                {
+                    sanitizedBody = sanitizedBody.Substring(0, 500) + "...";
+                }
+                logMessage += $"\n  Body: {sanitizedBody}";
+            }
+
+            if (statusCode >= 400 || statusCode == 0)
+            {
+                Debug.LogWarning(logMessage);
+            }
+            else
+            {
+                Debug.Log(logMessage);
+            }
+        }
+
+        private string SanitizeJsonForLogging(string json)
+        {
+            // Redact sensitive tokens from logs
+            var sanitized = System.Text.RegularExpressions.Regex.Replace(
+                json,
+                @"""(access_token|refresh_token|client_fingerprint)""\s*:\s*""[^""]*""",
+                @"""$1"": ""[REDACTED]"""
+            );
+            return sanitized;
         }
     }
 

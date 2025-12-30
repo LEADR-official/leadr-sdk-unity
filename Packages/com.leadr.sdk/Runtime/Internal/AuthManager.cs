@@ -25,12 +25,12 @@ namespace Leadr.Internal
 
         public async Task<LeadrResult<Session>> StartSessionAsync()
         {
-            var deviceId = TokenStorage.GetOrCreateDeviceId();
+            var fingerprint = TokenStorage.GetOrCreateFingerprint();
 
             var body = new Dictionary<string, object>
             {
                 { "game_id", gameId },
-                { "device_id", deviceId }
+                { "client_fingerprint", fingerprint }
             };
 
             var response = await httpClient.PostAsync("/v1/client/sessions", body);
