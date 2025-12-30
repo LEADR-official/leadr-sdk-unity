@@ -1,4 +1,6 @@
 ﻿<Solution>
   <Project Path="Leadr.csproj" />
   <Project Path="Leadr.Samples.BasicIntegration.csproj" />
+  <Project Path="Leadr.Samples.LeaderboardUI.csproj" />
+  <Project Path="Leadr.Samples.ScoreSubmission.csproj" />
 </Solution>

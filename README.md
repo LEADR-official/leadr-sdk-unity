@@ -32,3 +32,18 @@ var submitResult = await LeadrClient.Instance.SubmitScoreAsync(
     1000,
     "PlayerOne");
 ```
+
+## Development
+
+### Local API Testing
+
+When testing against a local LEADR server using HTTP (e.g., `http://localhost:3000`), Unity blocks the request by default.
+
+To enable HTTP connections:
+
+1. Go to **Edit > Project Settings > Player**
+2. Expand **Other Settings**
+3. Find **Allow downloads over HTTP (nonsecure)**
+4. Set to **Always allowed** (or **Development builds only**)
+
+> **Note:** Only use HTTP for local development. Production should always use HTTPS.
