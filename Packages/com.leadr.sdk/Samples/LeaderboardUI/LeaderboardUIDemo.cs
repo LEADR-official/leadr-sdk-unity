@@ -295,6 +295,11 @@ namespace Leadr.Samples.LeaderboardUI
                 refreshButton.interactable = !string.IsNullOrEmpty(selectedBoardId);
             }
 
+            if (boardDropdown != null)
+            {
+                boardDropdown.interactable = boards.Count > 0;
+            }
+
             // Update page info text
             if (pageInfoText != null && currentScoresPage != null)
             {
