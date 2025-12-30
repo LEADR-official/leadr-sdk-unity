@@ -191,7 +191,7 @@ namespace Leadr
         {
             EnsureInitialized();
 
-            var endpoint = $"/v1/boards?game_id={Uri.EscapeDataString(gameId)}&limit={limit}";
+            var endpoint = $"/v1/client/boards?game_id={Uri.EscapeDataString(gameId)}&limit={limit}";
             if (!string.IsNullOrEmpty(cursor))
             {
                 endpoint += $"&cursor={Uri.EscapeDataString(cursor)}";
@@ -219,7 +219,7 @@ namespace Leadr
                 return LeadrResult<Board>.Failure(0, "invalid_argument", "boardId is required");
             }
 
-            var endpoint = $"/v1/boards/{Uri.EscapeDataString(boardId)}";
+            var endpoint = $"/v1/client/boards/{Uri.EscapeDataString(boardId)}";
 
             return await authManager.ExecuteAuthenticatedAsync(
                 headers => httpClient.GetAsync(endpoint, headers),
@@ -261,7 +261,7 @@ namespace Leadr
                     0, "invalid_argument", "boardId is required");
             }
 
-            var endpoint = $"/v1/scores?board_id={Uri.EscapeDataString(boardId)}&limit={limit}";
+            var endpoint = $"/v1/client/scores?board_id={Uri.EscapeDataString(boardId)}&limit={limit}";
 
             if (!string.IsNullOrEmpty(sort))
             {
@@ -338,7 +338,7 @@ namespace Leadr
             }
 
             return await authManager.ExecuteAuthenticatedAsync(
-                headers => httpClient.PostAsync("/v1/scores", body, headers),
+                headers => httpClient.PostAsync("/v1/client/scores", body, headers),
                 Score.FromJson,
                 requiresNonce: true);
         }
