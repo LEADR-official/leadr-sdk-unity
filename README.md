@@ -1,97 +1,79 @@
-# leadr-sdk-unity
+# LEADR Unity SDK
 
-The official LEADR Unity SDK.
+[![Unity 2020.3+](https://img.shields.io/badge/Unity-2020.3%2B-blue)](https://unity.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 Add beautiful cross-platform leaderboards to your game in minutes.
 
-## Getting started
+**[Documentation](https://docs.leadr.gg)** · **[Status](https://status.leadr.gg)** · **[Discord](https://discord.gg/RMUukcAxSZ)**
 
-1. Download the LEADR CLI:
-2. Run `leadr register` and follow the instructions to create an account, your game and leaderboards
-3. Install the LEADR Unity SDK
-4. Add your game id to the LeadrSettings config
-5. Check out the [Basic Integration](/Packages/com.leadr.sdk/Samples/BasicIntegration) sample
+## Features
 
-For full documentation, visit [docs.leadr.gg/latest/sdks/unity](https://docs.leadr.gg/latest/sdks/unity).
+- **Drop-in UI Components** - Pre-built leaderboard and submission forms to get you started
+- **Anti-cheat Protection** - Server-side validation and rate limiting
+- **Seasons & Time Windows** - Weekly, monthly, or custom periods
+- **Rich Metadata** - Attach custom data to every score
+- **Web Views** - Shareable leaderboard pages for each board
+- **Async/Await** - Modern Unity async patterns
 
-## Usage example
+## Requirements
 
-```csharp
-// Initialize
-LeadrClient.Instance.Initialize("gam_your_game_id");
+- Unity 2020.3 or later
+- Unity 2021.2+ for UI Toolkit components
 
-// Get scores
-var result = await LeadrClient.Instance.GetScoresAsync("brd_board_id");
-if (result.IsSuccess)
-{
-    foreach (var score in result.Data.Items)
-        Debug.Log($"{score.PlayerName}: {score.Value}");
-}
+## Installation
 
-// Submit score
-var submitResult = await LeadrClient.Instance.SubmitScoreAsync(
-    "brd_board_id",
-    1000,
-    "PlayerOne");
-```
+1. Open **Window > Package Manager**
+2. Click **+** > **Add package from git URL**
+3. Enter: `https://github.com/LEADR-Official/leadr-sdk-unity.git?path=Packages/com.leadr.sdk`
+
+## Quick Start
+
+1. **Get your Game ID**: Visit our [Get Started](https://docs.leadr.gg/latest/quick_start/) page to download the CLI and create your account
+2. **Create Settings**: In Unity, go to `Assets > Create > LEADR > Settings` and enter your Game ID
+3. **Import a Sample**: In Package Manager, expand "Samples" and import **Basic Integration**
+4. **Configure & Run**: Assign your Settings asset and board slug, then enter Play mode and check the console output
+
+For full usage examples and API reference, see the **[SDK Documentation](https://docs.leadr.gg/sdks/unity)**.
 
 ## UI Toolkit Components
 
-The SDK includes ready-to-use UI Toolkit components for Unity 2021.2+:
+Pre-built components for Unity 2021.2+ (UI Toolkit):
 
-- **LeadrBoardView** - Paginated leaderboard display with loading/error/empty states
-- **LeadrScoreSubmitter** - Score submission form with validation
-- **LeadrScoreEntry** - Individual score row component
+| Component | Description |
+|-----------|-------------|
+| `LeadrBoardView` | Paginated leaderboard with loading/error/empty states |
+| `LeadrScoreSubmitter` | Score submission form with validation |
+| `LeadrScoreEntry` | Individual score row |
 
-```csharp
-// Programmatic usage
-var board = new LeadrBoardView {
-    Board = "weekly",  // Use board slug
-    ScoresPerPage = 10,
-    Title = "High Scores"
-};
-board.ScoreSelected += args => Debug.Log($"Selected: {args.Score.PlayerName}");
-await board.LoadAsync();
-```
-
-```xml
-<!-- Or declarative in UXML -->
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:leadr="Leadr.UI">
-    <leadr:LeadrBoardView board="weekly" auto-load="true" />
-</ui:UXML>
-```
-
-Styles are provided via `LeadrCommon.uss`. You can customize colors by overriding the CSS variables defined in that file.
+See the **LeadrUIComponents** sample for a complete demo.
 
 ## Samples
 
-Import samples via **Window > Package Manager > LEADR Unity SDK > Samples**.
+Import via **Window > Package Manager > LEADR Unity SDK > Samples**.
 
 | Sample | Description |
 |--------|-------------|
-| **Basic Integration** | Minimal example showing SDK initialization and fetching boards |
-| **Canvas Example** | Complete uGUI example with board selector, score list, pagination, and submission |
-| **LeadrUIComponents** | Demo of modern UI Toolkit components (Unity 2021.2+) |
-
-### Using the Samples
-
-1. **Import**: In Package Manager, expand "Samples" and click "Import" next to the sample you want
-2. **Create Settings**: `Assets > Create > LEADR > Settings`, enter your Game ID
-3. **Configure Scene**: Open the sample scene and assign your LeadrSettings asset to the demo script
-4. **Set Board**: Enter your board slug (e.g., "weekly") in the demo script's inspector
-5. **Play**: Enter Play mode to test
+| **Basic Integration** | Minimal example: initialize, fetch board by slug, display scores |
+| **Canvas Example** | Full uGUI example with board selector, pagination, and submission |
+| **LeadrUIComponents** | UI Toolkit components demo with board selector |
 
 ## Development
 
 ### Local API Testing
 
-When testing against a local LEADR server using HTTP (i.e., `Base Url` in LeadrSettings is `http://localhost:3000`), Unity blocks the request by default.
-
-To enable HTTP connections:
+When developing/testing locally (ie against `http://localhost:3000`):
 
 1. Go to **Edit > Project Settings > Player**
 2. Expand **Other Settings**
-3. Find **Allow downloads over HTTP (nonsecure)**
-4. Set to **Development builds only**
+3. Set **Allow downloads over HTTP** to **Development builds only**
 
-> **Note:** Only use HTTP for local development. Production should always use HTTPS.
+## Support
+
+- [Documentation](https://docs.leadr.gg)
+- [Discord Community](https://discord.gg/RMUukcAxSZ)
+- [Report Issues](https://github.com/LEADR-Official/leadr-sdk-unity/issues)
+
+## License
+
+Apache v2 License - see [LICENSE](LICENSE) for details.

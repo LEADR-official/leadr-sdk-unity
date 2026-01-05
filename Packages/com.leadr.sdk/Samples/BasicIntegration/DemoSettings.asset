@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c0eabc9a0efa4b8d88f8ed0fbfd3a55, type: 3}
   m_Name: DemoSettings
   m_EditorClassIdentifier: Leadr::Leadr.LeadrSettings
-  gameId: your-game-id
-  baseUrl: https://api.leadrcloud.com/
+  gameId: gam_a37ce8f0-06c6-4772-913e-13edd48935f7
+  baseUrl: http://0.0.0.0:8000/
   debugLogging: 1
