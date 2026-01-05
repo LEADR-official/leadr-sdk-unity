@@ -338,7 +338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Leadr.Samples.BasicIntegration::Leadr.Samples.BasicIntegration.BasicIntegrationDemo
   settings: {fileID: 11400000, guid: 1e6b4b3c6d53c47da80637a138830379, type: 2}
-  gameId: 
+  board: weekly
 --- !u!4 &2010399052
 Transform:
   m_ObjectHideFlags: 0

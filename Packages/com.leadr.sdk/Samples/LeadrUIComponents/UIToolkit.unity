@@ -242,7 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Leadr.Samples.UIToolkit::Leadr.Samples.UIToolkit.UIToolkitController
   settings: {fileID: 11400000, guid: aabf6ecbd89c145efa39c97ccaf44855, type: 2}
-  boardId: brd_70dfa8bb-962d-46de-b55d-8e876eb052ad
+  board: weekly
   uiDocument: {fileID: 387710685}
   styles: {fileID: 7433441132597879392, guid: deadd461b79fc4508a652fb50f2e25c5, type: 3}
 --- !u!114 &387710685

@@ -1,6 +1,4 @@
-using System.Threading.Tasks;
 using Leadr;
-using Leadr.Models;
 using UnityEngine;
 
 namespace Leadr.Samples.BasicIntegration
@@ -9,111 +7,71 @@ namespace Leadr.Samples.BasicIntegration
     /// Demonstrates basic LEADR SDK integration.
     ///
     /// This sample shows how to:
-    /// - Initialize the LeadrClient with settings
-    /// - Fetch the list of boards for your game
-    /// - Handle async/await patterns in Unity
-    ///
-    /// Attach this script to any GameObject in your scene.
+    /// - Initialize the LeadrClient
+    /// - Fetch a board by slug
+    /// - Fetch scores for that board
     /// </summary>
     public class BasicIntegrationDemo : MonoBehaviour
     {
         [Header("LEADR Configuration")]
-        [Tooltip("Reference to your LeadrSettings asset")]
         [SerializeField] private LeadrSettings settings;
 
-        [Header("Alternative: Direct Configuration")]
-        [Tooltip("Your Game ID (used if settings is not assigned)")]
-        [SerializeField] private string gameId;
+        [Header("Board")]
+        [SerializeField] private string board;
 
         private async void Start()
         {
             // Initialize the LEADR client
-            // The client is a singleton - you only need to initialize it once
-            InitializeClient();
-
-            // Fetch and display boards
-            await FetchAndLogBoardsAsync();
-        }
-
-        private void InitializeClient()
-        {
-            // Option 1: Use a LeadrSettings ScriptableObject (recommended)
-            // This allows you to configure settings in the Unity Editor
             if (settings != null)
             {
                 LeadrClient.Instance.Initialize(settings);
-                Debug.Log("[BasicDemo] Initialized with LeadrSettings asset");
+            }
+            else
+            {
+                Debug.LogError("[BasicDemo] LeadrSettings not assigned!");
                 return;
             }
 
-            // Option 2: Initialize with just a game ID
-            // Useful for quick testing or when settings come from elsewhere
-            if (!string.IsNullOrEmpty(gameId))
+            if (string.IsNullOrEmpty(board))
             {
-                LeadrClient.Instance.Initialize(gameId);
-                Debug.Log("[BasicDemo] Initialized with game ID");
+                Debug.LogError("[BasicDemo] Board slug not configured!");
                 return;
             }
 
-            Debug.LogError("[BasicDemo] No settings or game ID configured!");
-        }
+            // Fetch board by slug
+            Debug.Log($"[BasicDemo] Fetching board '{board}'...");
+            var boardResult = await LeadrClient.Instance.GetBoardAsync(board);
 
-        private async Task FetchAndLogBoardsAsync()
-        {
-            Debug.Log("[BasicDemo] Fetching boards...");
-
-            // GetBoardsAsync returns a LeadrResult<PagedResult<Board>>
-            // LeadrResult wraps the response and includes error handling
-            var result = await LeadrClient.Instance.GetBoardsAsync(limit: 10);
-
-            // Always check IsSuccess before accessing Data
-            if (!result.IsSuccess)
+            if (!boardResult.IsSuccess)
             {
-                // Error contains status code, error code, and message
-                Debug.LogError($"[BasicDemo] Failed to fetch boards: {result.Error}");
+                Debug.LogError($"[BasicDemo] Failed to fetch board: {boardResult.Error}");
                 return;
             }
 
-            // PagedResult contains Items (the data), Count, and pagination info
-            var boards = result.Data;
-            Debug.Log($"[BasicDemo] Found {boards.Items.Count} boards:");
+            var fetchedBoard = boardResult.Data;
+            Debug.Log($"[BasicDemo] Board: {fetchedBoard.Name} ({fetchedBoard.ShortCode})");
 
-            foreach (var board in boards.Items)
+            // Fetch scores for the board
+            Debug.Log("[BasicDemo] Fetching scores...");
+            var scoresResult = await LeadrClient.Instance.GetScoresAsync(fetchedBoard.Id, limit: 10);
+
+            if (!scoresResult.IsSuccess)
             {
-                LogBoard(board);
+                Debug.LogError($"[BasicDemo] Failed to fetch scores: {scoresResult.Error}");
+                return;
             }
 
-            // Check if there are more pages available
-            if (boards.HasNext)
+            var scores = scoresResult.Data;
+            Debug.Log($"[BasicDemo] Found {scores.Items.Count} scores:");
+
+            int rank = 1;
+            foreach (var score in scores.Items)
             {
-                Debug.Log("[BasicDemo] More boards available. Use NextPageAsync() to fetch them.");
-            }
-        }
-
-        private void LogBoard(Board board)
-        {
-            // Board properties available:
-            // - Id: Unique identifier (e.g., "brd_abc123...")
-            // - Name: Display name
-            // - Slug: URL-friendly identifier
-            // - ShortCode: Short code for sharing
-            // - SortDirection: "ascending" or "descending"
-            // - KeepStrategy: "all", "highest", or "latest"
-            // - IsActive, IsPublished: Status flags
-            // - Tags: List of string tags
-            // - StartsAt, EndsAt: Optional season dates
-
-            var status = board.IsActive ? "Active" : "Inactive";
-            var published = board.IsPublished ? "Published" : "Draft";
-
-            Debug.Log($"  - {board.Name} ({board.ShortCode})");
-            Debug.Log($"    ID: {board.Id}");
-            Debug.Log($"    Sort: {board.SortDirection}, Keep: {board.KeepStrategy}");
-            Debug.Log($"    Status: {status}, {published}");
-
-            if (board.Tags != null && board.Tags.Count > 0)
-            {
-                Debug.Log($"    Tags: {string.Join(", ", board.Tags)}");
+                var display = !string.IsNullOrEmpty(score.ValueDisplay)
+                    ? score.ValueDisplay
+                    : score.Value.ToString("N0");
+                Debug.Log($"  {rank}. {score.PlayerName}: {display}");
+                rank++;
             }
         }
     }

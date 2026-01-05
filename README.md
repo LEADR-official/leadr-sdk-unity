@@ -10,7 +10,7 @@ Add beautiful cross-platform leaderboards to your game in minutes.
 2. Run `leadr register` and follow the instructions to create an account, your game and leaderboards
 3. Install the LEADR Unity SDK
 4. Add your game id to the LeadrSettings config
-5. Check out the [Basic Integration]() sample
+5. Check out the [Basic Integration](/Packages/com.leadr.sdk/Samples/BasicIntegration) sample
 
 For full documentation, visit [docs.leadr.gg/latest/sdks/unity](https://docs.leadr.gg/latest/sdks/unity).
 
@@ -46,7 +46,7 @@ The SDK includes ready-to-use UI Toolkit components for Unity 2021.2+:
 ```csharp
 // Programmatic usage
 var board = new LeadrBoardView {
-    BoardId = "brd_abc123",
+    Board = "weekly",  // Use board slug
     ScoresPerPage = 10,
     Title = "High Scores"
 };
@@ -57,7 +57,7 @@ await board.LoadAsync();
 ```xml
 <!-- Or declarative in UXML -->
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:leadr="Leadr.UI">
-    <leadr:LeadrBoardView board-id="brd_abc123" auto-load="true" />
+    <leadr:LeadrBoardView board="weekly" auto-load="true" />
 </ui:UXML>
 ```
 
@@ -70,29 +70,16 @@ Import samples via **Window > Package Manager > LEADR Unity SDK > Samples**.
 | Sample | Description |
 |--------|-------------|
 | **Basic Integration** | Minimal example showing SDK initialization and fetching boards |
-| **Leaderboard UI** | Complete uGUI example with board selector, score list, and pagination |
-| **Score Submission** | Submitting scores with metadata (level, difficulty, platform info) |
-| **UI Toolkit** | Modern UI Toolkit components (Unity 2021.2+) |
+| **Canvas Example** | Complete uGUI example with board selector, score list, pagination, and submission |
+| **LeadrUIComponents** | Demo of modern UI Toolkit components (Unity 2021.2+) |
 
 ### Using the Samples
 
 1. **Import**: In Package Manager, expand "Samples" and click "Import" next to the sample you want
 2. **Create Settings**: `Assets > Create > LEADR > Settings`, enter your Game ID
 3. **Configure Scene**: Open the sample scene and assign your LeadrSettings asset to the demo script
-4. **Set Board ID**: Enter your board ID in the demo script's inspector
+4. **Set Board**: Enter your board slug (e.g., "weekly") in the demo script's inspector
 5. **Play**: Enter Play mode to test
-
-### UI Toolkit Sample Setup
-
-The UI Toolkit sample requires additional setup:
-
-1. Create a new scene or open an existing one
-2. Create an empty GameObject, add `UI Document` and `UIToolkitController` components
-3. Assign references in the inspector:
-   - **Settings**: Your LeadrSettings asset
-   - **Board Id**: Your board ID
-   - **UI Document**: The UIDocument component on the same GameObject
-   - **Styles**: `Packages/com.leadr.sdk/Runtime/UI/Styles/LeadrCommon.uss`
 
 ## Development
 

@@ -53,8 +53,8 @@ namespace Leadr.UI
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Set <see cref="BoardId"/> and call <see cref="LoadAsync"/> to fetch and display scores.
-    /// Alternatively, set <see cref="AutoLoad"/> to true to load automatically when BoardId changes.
+    /// Set <see cref="Board"/> (the board slug) and call <see cref="LoadAsync"/> to fetch and display scores.
+    /// Alternatively, set <see cref="AutoLoad"/> to true to load automatically when Board changes.
     /// </para>
     /// <para>
     /// The component handles loading states, errors, empty states, and pagination automatically.
@@ -65,7 +65,7 @@ namespace Leadr.UI
     /// <code>
     /// var board = new LeadrBoardView
     /// {
-    ///     BoardId = "brd_abc123",
+    ///     Board = "weekly",
     ///     ScoresPerPage = 10,
     ///     Title = "High Scores"
     /// };
@@ -123,7 +123,8 @@ namespace Leadr.UI
         private int m_CurrentPageNumber = 1;
 
         // Configuration
-        private string m_BoardId = "";
+        private string m_Board = "";
+        private string m_ResolvedBoardId;
         private int m_ScoresPerPage = 10;
         private bool m_AutoLoad;
         private bool m_ShowPagination = true;
@@ -144,17 +145,18 @@ namespace Leadr.UI
         public event Action PageLoaded;
 
         /// <summary>
-        /// Gets or sets the board ID to display scores from.
+        /// Gets or sets the board slug to display scores from (e.g., "weekly", "all-time").
         /// </summary>
-        [UxmlAttribute("board-id")]
-        public string BoardId
+        [UxmlAttribute("board")]
+        public string Board
         {
-            get => m_BoardId;
+            get => m_Board;
             set
             {
-                if (m_BoardId != value)
+                if (m_Board != value)
                 {
-                    m_BoardId = value;
+                    m_Board = value;
+                    m_ResolvedBoardId = null;  // Clear cached ID when slug changes
                     if (m_AutoLoad && !string.IsNullOrEmpty(value))
                     {
                         _ = LoadAsync();
@@ -174,7 +176,7 @@ namespace Leadr.UI
         }
 
         /// <summary>
-        /// Gets or sets whether to auto-load when BoardId changes.
+        /// Gets or sets whether to auto-load when Board changes.
         /// </summary>
         [UxmlAttribute("auto-load")]
         public bool AutoLoad
@@ -370,26 +372,35 @@ namespace Leadr.UI
         /// <returns>A task that completes when loading finishes.</returns>
         public async Task LoadAsync()
         {
-            if (string.IsNullOrEmpty(m_BoardId))
+            if (string.IsNullOrEmpty(m_Board))
             {
-                SetError("Board ID not configured");
+                SetError("Board not configured");
                 return;
             }
 
             State = LeaderboardState.Loading;
             m_CurrentPageNumber = 1;
 
-            // Fetch board name for title if not explicitly set
-            if (!m_TitleOverridden)
+            // Resolve slug to board (fetches board and caches ID)
+            var boardResult = await Client.GetBoardAsync(m_Board);
+            if (!boardResult.IsSuccess)
             {
-                var boardResult = await Client.GetBoardAsync(m_BoardId);
-                if (boardResult.IsSuccess)
-                {
-                    m_TitleLabel.text = boardResult.Data.Name;
-                }
+                SetError(boardResult.Error.Message);
+                ErrorOccurred?.Invoke(boardResult.Error);
+                return;
             }
 
-            var result = await Client.GetScoresAsync(m_BoardId, m_ScoresPerPage, m_SortOverride);
+            var board = boardResult.Data;
+            m_ResolvedBoardId = board.Id;
+
+            // Set title if not overridden
+            if (!m_TitleOverridden)
+            {
+                m_TitleLabel.text = board.Name;
+            }
+
+            // Fetch scores using resolved board_id
+            var result = await Client.GetScoresAsync(m_ResolvedBoardId, m_ScoresPerPage, m_SortOverride);
 
             if (result.IsSuccess)
             {

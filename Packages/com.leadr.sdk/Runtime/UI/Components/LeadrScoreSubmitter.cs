@@ -62,7 +62,7 @@ namespace Leadr.UI
     /// <code>
     /// var submitter = new LeadrScoreSubmitter
     /// {
-    ///     BoardId = "brd_abc123"
+    ///     Board = "weekly"
     /// };
     /// submitter.SetScore(1000, "1,000 pts");
     /// submitter.ScoreSubmitted += args => Debug.Log($"Submitted: {args.Score.Id}");
@@ -106,7 +106,8 @@ namespace Leadr.UI
         private bool m_IsValid;
 
         // Configuration
-        private string m_BoardId = "";
+        private string m_Board = "";
+        private string m_ResolvedBoardId;
         private int m_MinNameLength = 1;
         private int m_MaxNameLength = 50;
         private bool m_ShowScoreInput;
@@ -127,15 +128,16 @@ namespace Leadr.UI
         public event Action<bool> ValidationChanged;
 
         /// <summary>
-        /// Gets or sets the board ID to submit scores to.
+        /// Gets or sets the board slug to submit scores to (e.g., "weekly", "all-time").
         /// </summary>
-        [UxmlAttribute("board-id")]
-        public string BoardId
+        [UxmlAttribute("board")]
+        public string Board
         {
-            get => m_BoardId;
+            get => m_Board;
             set
             {
-                m_BoardId = value;
+                m_Board = value;
+                m_ResolvedBoardId = null;  // Clear cached ID when slug changes
                 Validate();
             }
         }
@@ -373,10 +375,10 @@ namespace Leadr.UI
                 }
             }
 
-            // Validate board ID
-            if (string.IsNullOrEmpty(m_BoardId))
+            // Validate board
+            if (string.IsNullOrEmpty(m_Board))
             {
-                errors.Add("Board ID not configured");
+                errors.Add("Board not configured");
             }
 
             m_IsValid = errors.Count == 0;
@@ -436,8 +438,25 @@ namespace Leadr.UI
 
             State = SubmitterState.Submitting;
 
+            // Resolve board slug to board_id if not already cached
+            if (string.IsNullOrEmpty(m_ResolvedBoardId))
+            {
+                var boardResult = await Client.GetBoardAsync(m_Board);
+                if (!boardResult.IsSuccess)
+                {
+                    State = SubmitterState.Error;
+                    m_FeedbackLabel.text = $"Could not resolve board: {boardResult.Error.Message}";
+                    SubmissionFailed?.Invoke(boardResult.Error);
+                    return LeadrResult<Score>.Failure(
+                        boardResult.Error.StatusCode,
+                        boardResult.Error.Code,
+                        boardResult.Error.Message);
+                }
+                m_ResolvedBoardId = boardResult.Data.Id;
+            }
+
             var result = await Client.SubmitScoreAsync(
-                m_BoardId,
+                m_ResolvedBoardId,
                 m_ScoreValue,
                 PlayerName.Trim(),
                 m_ValueDisplay,

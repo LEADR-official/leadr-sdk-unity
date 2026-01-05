@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Leadr.Models;
 using Leadr.UI;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -12,7 +16,7 @@ namespace Leadr.Samples.LeadrUIComponents
     {
         [Header("Configuration")]
         [SerializeField] private LeadrSettings settings;
-        [SerializeField] private string boardId = "";
+        [SerializeField] private string board = "";
 
         [Header("UI Document")]
         [SerializeField] private UIDocument uiDocument;
@@ -24,6 +28,8 @@ namespace Leadr.Samples.LeadrUIComponents
         private LeadrScoreSubmitter m_ScoreSubmitter;
         private Button m_SimulateScoreButton;
         private Label m_StatusLabel;
+        private DropdownField m_BoardDropdown;
+        private List<Board> m_Boards = new List<Board>();
 
         private void Awake()
         {
@@ -58,11 +64,8 @@ namespace Leadr.Samples.LeadrUIComponents
             // Build UI
             BuildUI(root);
 
-            // Load initial data
-            if (!string.IsNullOrEmpty(boardId))
-            {
-                await m_BoardView.LoadAsync();
-            }
+            // Load boards and populate dropdown
+            await LoadBoardsAsync();
         }
 
         private void BuildUI(VisualElement root)
@@ -107,12 +110,35 @@ namespace Leadr.Samples.LeadrUIComponents
             };
             header.Add(title);
 
+            // Header controls container (right side)
+            var headerControls = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    alignItems = Align.Center
+                }
+            };
+
+            // Board dropdown
+            m_BoardDropdown = new DropdownField
+            {
+                label = "Board",
+                style = { marginRight = 8, minWidth = 150 }
+            };
+            m_BoardDropdown.RegisterValueChangedCallback(evt =>
+            {
+                _ = OnBoardSelected(m_BoardDropdown.index);
+            });
+            headerControls.Add(m_BoardDropdown);
+
             m_SimulateScoreButton = new Button(SimulateScore)
             {
                 text = "Simulate Score"
             };
-            header.Add(m_SimulateScoreButton);
+            headerControls.Add(m_SimulateScoreButton);
 
+            header.Add(headerControls);
             container.Add(header);
 
             // Status label
@@ -151,7 +177,7 @@ namespace Leadr.Samples.LeadrUIComponents
 
             m_BoardView = new LeadrBoardView
             {
-                BoardId = boardId,
+                Board = board,
                 ScoresPerPage = 10
             };
             m_BoardView.style.flexGrow = 1;
@@ -189,7 +215,7 @@ namespace Leadr.Samples.LeadrUIComponents
 
             m_ScoreSubmitter = new LeadrScoreSubmitter
             {
-                BoardId = boardId,
+                Board = board,
                 ShowScoreInput = false,
                 ClearOnSuccess = false
             };
@@ -212,6 +238,56 @@ namespace Leadr.Samples.LeadrUIComponents
             var score = Random.Range(100, 10000);
             m_ScoreSubmitter.SetScore(score, $"{score:N0} pts");
             SetStatus($"Simulated score: {score:N0}");
+        }
+
+        private async Task LoadBoardsAsync()
+        {
+            SetStatus("Loading boards...");
+
+            var result = await LeadrClient.Instance.GetBoardsAsync();
+            if (!result.IsSuccess)
+            {
+                SetStatus($"Error loading boards: {result.Error.Message}", true);
+                return;
+            }
+
+            m_Boards = result.Data.Items;
+
+            // Populate dropdown
+            m_BoardDropdown.choices = m_Boards.Select(b => b.Name).ToList();
+
+            if (m_Boards.Count > 0)
+            {
+                // Select first board (or match the inspector-configured slug)
+                int defaultIndex = 0;
+                if (!string.IsNullOrEmpty(board))
+                {
+                    var idx = m_Boards.FindIndex(b => b.Slug == board);
+                    if (idx >= 0) defaultIndex = idx;
+                }
+                m_BoardDropdown.index = defaultIndex;
+                await OnBoardSelected(defaultIndex);
+            }
+            else
+            {
+                SetStatus("No boards found for this game.");
+            }
+        }
+
+        private async Task OnBoardSelected(int index)
+        {
+            if (index < 0 || index >= m_Boards.Count) return;
+
+            var selectedBoard = m_Boards[index];
+
+            // Update both components to use the selected board's slug
+            m_BoardView.Board = selectedBoard.Slug;
+            m_ScoreSubmitter.Board = selectedBoard.Slug;
+
+            // Load the leaderboard
+            await m_BoardView.LoadAsync();
+
+            SetStatus($"Switched to {selectedBoard.Name}");
         }
 
         private void OnScoreSelected(ScoreSelectedEventArgs args)

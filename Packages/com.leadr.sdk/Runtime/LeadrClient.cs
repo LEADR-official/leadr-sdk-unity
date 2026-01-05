@@ -25,11 +25,12 @@ namespace Leadr
     /// // Initialize with settings asset
     /// LeadrClient.Instance.Initialize(mySettings);
     ///
-    /// // Fetch scores
-    /// var result = await LeadrClient.Instance.GetScoresAsync("brd_abc123");
-    /// if (result.IsSuccess)
+    /// // Fetch board by slug, then fetch scores
+    /// var boardResult = await LeadrClient.Instance.GetBoardAsync("weekly");
+    /// if (boardResult.IsSuccess)
     /// {
-    ///     foreach (var score in result.Data.Items)
+    ///     var scoresResult = await LeadrClient.Instance.GetScoresAsync(boardResult.Data.Id);
+    ///     foreach (var score in scoresResult.Data.Items)
     ///         Debug.Log($"{score.PlayerName}: {score.Value}");
     /// }
     /// </code>
@@ -206,24 +207,37 @@ namespace Leadr
         }
 
         /// <summary>
-        /// Fetches a single board by its ID.
+        /// Fetches a single board by its slug.
         /// </summary>
-        /// <param name="boardId">The board ID (e.g., "brd_abc123...").</param>
+        /// <param name="boardSlug">The board slug (e.g., "weekly", "all-time").</param>
         /// <returns>A result containing the board or an error.</returns>
-        public async Task<LeadrResult<Board>> GetBoardAsync(string boardId)
+        public async Task<LeadrResult<Board>> GetBoardAsync(string boardSlug)
         {
             EnsureInitialized();
 
-            if (string.IsNullOrEmpty(boardId))
+            if (string.IsNullOrEmpty(boardSlug))
             {
-                return LeadrResult<Board>.Failure(0, "invalid_argument", "boardId is required");
+                return LeadrResult<Board>.Failure(0, "invalid_argument", "boardSlug is required");
             }
 
-            var endpoint = $"/v1/client/boards/{Uri.EscapeDataString(boardId)}";
+            var endpoint = $"/v1/client/boards/?slug={Uri.EscapeDataString(boardSlug)}&game_id={Uri.EscapeDataString(gameId)}";
 
-            return await authManager.ExecuteAuthenticatedAsync(
+            // The slug endpoint returns a paginated list, so we parse it and extract the first item
+            var pagedResult = await authManager.ExecuteAuthenticatedAsync(
                 headers => httpClient.GetAsync(endpoint, headers),
-                Board.FromJson);
+                json => PagedResult<Board>.FromJson(json, Board.FromJson, null));
+
+            if (!pagedResult.IsSuccess)
+            {
+                return LeadrResult<Board>.Failure(pagedResult.Error);
+            }
+
+            if (pagedResult.Data.Items.Count == 0)
+            {
+                return LeadrResult<Board>.Failure(404, "not_found", $"Board with slug '{boardSlug}' not found");
+            }
+
+            return LeadrResult<Board>.Success(pagedResult.Data.Items[0]);
         }
 
         /// <summary>
