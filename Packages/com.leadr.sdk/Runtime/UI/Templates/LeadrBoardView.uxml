@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:leadr="Leadr.UI">
+    <leadr:LeadrBoardView
+        name="board-view"
+        board-id=""
+        scores-per-page="10"
+        auto-load="false"
+        show-pagination="true"
+        title="Leaderboard" />
+</ui:UXML>

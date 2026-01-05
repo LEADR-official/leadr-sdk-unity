@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:leadr="Leadr.UI">
+    <leadr:LeadrScoreSubmitter
+        name="score-submitter"
+        board-id=""
+        min-name-length="1"
+        max-name-length="50"
+        show-score-input="false"
+        clear-on-success="false" />
+</ui:UXML>

@@ -1,0 +1,3 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:leadr="Leadr.UI">
+    <leadr:LeadrScoreEntry name="score-entry" show-date="true" show-rank="true" />
+</ui:UXML>

@@ -11,18 +11,18 @@
   "samples": [
     {
       "displayName": "Basic Integration",
-      "description": "Simple example showing SDK initialization and fetching boards",
+      "description": "SDK initialization and API basics",
       "path": "Samples~/BasicIntegration"
     },
     {
-      "displayName": "Leaderboard UI",
-      "description": "Complete UI example with board selector, score list, and pagination",
-      "path": "Samples~/LeaderboardUI"
+      "displayName": "Canvas Example",
+      "description": "Full example using Unity Canvas (uGUI) with leaderboard display and score submission",
+      "path": "Samples~/CanvasExample"
     },
     {
-      "displayName": "Score Submission",
-      "description": "Example showing how to submit scores with metadata",
-      "path": "Samples~/ScoreSubmission"
+      "displayName": "Leadr UI Components",
+      "description": "Pre-built UI Toolkit components for Unity 2021.2+",
+      "path": "Samples~/LeadrUIComponents"
     }
   ]
 }

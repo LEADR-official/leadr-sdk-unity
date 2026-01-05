@@ -1,0 +1,17 @@
+{
+    "name": "Leadr.Samples.CanvasExample",
+    "rootNamespace": "Leadr.Samples.CanvasExample",
+    "references": [
+        "Leadr",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

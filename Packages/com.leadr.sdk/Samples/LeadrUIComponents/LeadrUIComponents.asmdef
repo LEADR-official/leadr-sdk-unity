@@ -1,0 +1,17 @@
+{
+    "name": "Leadr.Samples.LeadrUIComponents",
+    "rootNamespace": "Leadr.Samples.LeadrUIComponents",
+    "references": [
+        "Leadr",
+        "Leadr.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

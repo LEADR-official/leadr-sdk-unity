@@ -1,0 +1,299 @@
+/* LEADR UI Toolkit - Common Styles */
+/* CSS variables for theming - override these in LeadrDark.uss or LeadrLight.uss */
+
+:root {
+    /* Primary Colors */
+    --leadr-primary-color: #4A90D9;
+    --leadr-primary-hover-color: #3A80C9;
+    --leadr-secondary-color: #2ECC71;
+    --leadr-error-color: #E74C3C;
+    --leadr-warning-color: #F1C40F;
+
+    /* Text Colors */
+    --leadr-text-color: #333333;
+    --leadr-text-muted-color: #888888;
+    --leadr-text-inverse-color: #FFFFFF;
+
+    /* Background Colors */
+    --leadr-background-color: #FFFFFF;
+    --leadr-background-secondary-color: #F5F5F5;
+    --leadr-background-hover-color: #E8F4FD;
+
+    /* Border Colors */
+    --leadr-border-color: #DDDDDD;
+
+    /* Spacing */
+    --leadr-spacing-xs: 4px;
+    --leadr-spacing-sm: 8px;
+    --leadr-spacing-md: 16px;
+    --leadr-spacing-lg: 24px;
+    --leadr-spacing-xl: 32px;
+
+    /* Typography */
+    --leadr-font-size-xs: 10px;
+    --leadr-font-size-sm: 12px;
+    --leadr-font-size-md: 14px;
+    --leadr-font-size-lg: 18px;
+    --leadr-font-size-xl: 24px;
+
+    /* Borders */
+    --leadr-border-radius: 4px;
+    --leadr-border-width: 1px;
+}
+
+/* ===== Utility Classes ===== */
+
+.leadr-hidden {
+    display: none;
+}
+
+/* ===== LeadrScoreEntry ===== */
+
+.leadr-score-entry {
+    flex-direction: row;
+    align-items: center;
+    padding: var(--leadr-spacing-sm) var(--leadr-spacing-md);
+    border-bottom-width: var(--leadr-border-width);
+    border-bottom-color: var(--leadr-border-color);
+    background-color: var(--leadr-background-color);
+    min-height: 48px;
+}
+
+.leadr-score-entry:hover {
+    background-color: var(--leadr-background-hover-color);
+}
+
+.leadr-score-entry--selected {
+    background-color: var(--leadr-background-hover-color);
+    border-left-width: 3px;
+    border-left-color: var(--leadr-primary-color);
+}
+
+.leadr-score-entry--highlighted {
+    background-color: var(--leadr-secondary-color);
+}
+
+.leadr-score-entry--highlighted .leadr-score-entry__rank,
+.leadr-score-entry--highlighted .leadr-score-entry__player-name,
+.leadr-score-entry--highlighted .leadr-score-entry__value,
+.leadr-score-entry--highlighted .leadr-score-entry__date {
+    color: var(--leadr-text-inverse-color);
+}
+
+.leadr-score-entry__rank {
+    min-width: 48px;
+    -unity-font-style: bold;
+    color: var(--leadr-text-muted-color);
+    font-size: var(--leadr-font-size-md);
+}
+
+.leadr-score-entry__player-name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    -unity-font-style: bold;
+    font-size: var(--leadr-font-size-md);
+    color: var(--leadr-text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leadr-score-entry__value {
+    min-width: 80px;
+    -unity-text-align: middle-right;
+    font-size: var(--leadr-font-size-md);
+    color: var(--leadr-primary-color);
+    -unity-font-style: bold;
+}
+
+.leadr-score-entry__date {
+    min-width: 80px;
+    -unity-text-align: middle-right;
+    font-size: var(--leadr-font-size-sm);
+    color: var(--leadr-text-muted-color);
+}
+
+/* ===== LeadrBoardView ===== */
+
+.leadr-board-view {
+    flex-grow: 1;
+    background-color: var(--leadr-background-color);
+    border-radius: var(--leadr-border-radius);
+    border-width: var(--leadr-border-width);
+    border-color: var(--leadr-border-color);
+}
+
+.leadr-board-view__header {
+    padding: var(--leadr-spacing-md);
+    border-bottom-width: var(--leadr-border-width);
+    border-bottom-color: var(--leadr-border-color);
+    background-color: var(--leadr-background-secondary-color);
+}
+
+.leadr-board-view__title {
+    font-size: var(--leadr-font-size-lg);
+    -unity-font-style: bold;
+    color: var(--leadr-text-color);
+}
+
+.leadr-board-view__list {
+    flex-grow: 1;
+    min-height: 200px;
+}
+
+.leadr-board-view__footer {
+    padding: var(--leadr-spacing-sm) var(--leadr-spacing-md);
+    border-top-width: var(--leadr-border-width);
+    border-top-color: var(--leadr-border-color);
+    background-color: var(--leadr-background-secondary-color);
+}
+
+.leadr-board-view__pagination {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.leadr-board-view__pagination Button {
+    min-width: 80px;
+}
+
+.leadr-board-view__page-info {
+    color: var(--leadr-text-muted-color);
+    font-size: var(--leadr-font-size-sm);
+}
+
+/* Loading Overlay */
+.leadr-board-view__loading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    justify-content: center;
+    align-items: center;
+}
+
+.leadr-board-view__loading Label {
+    font-size: var(--leadr-font-size-md);
+    color: var(--leadr-text-muted-color);
+}
+
+/* Error State */
+.leadr-board-view__error {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    padding: var(--leadr-spacing-lg);
+}
+
+.leadr-board-view__error Label {
+    color: var(--leadr-error-color);
+    margin-bottom: var(--leadr-spacing-md);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+/* Empty State */
+.leadr-board-view__empty {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    padding: var(--leadr-spacing-lg);
+}
+
+.leadr-board-view__empty Label {
+    color: var(--leadr-text-muted-color);
+    font-size: var(--leadr-font-size-md);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+/* ===== LeadrScoreSubmitter ===== */
+
+.leadr-score-submitter {
+    padding: var(--leadr-spacing-md);
+    background-color: var(--leadr-background-color);
+    border-radius: var(--leadr-border-radius);
+    border-width: var(--leadr-border-width);
+    border-color: var(--leadr-border-color);
+}
+
+.leadr-score-submitter__form {
+    flex-grow: 1;
+}
+
+.leadr-score-submitter__input {
+    margin-bottom: var(--leadr-spacing-sm);
+}
+
+.leadr-score-submitter__input Label {
+    min-width: 100px;
+    color: var(--leadr-text-color);
+}
+
+.leadr-score-submitter__score-display {
+    font-size: var(--leadr-font-size-xl);
+    -unity-font-style: bold;
+    color: var(--leadr-primary-color);
+    -unity-text-align: middle-center;
+    padding: var(--leadr-spacing-md);
+    margin-bottom: var(--leadr-spacing-md);
+    background-color: var(--leadr-background-secondary-color);
+    border-radius: var(--leadr-border-radius);
+}
+
+.leadr-score-submitter__validation {
+    color: var(--leadr-error-color);
+    font-size: var(--leadr-font-size-sm);
+    min-height: 20px;
+    margin-bottom: var(--leadr-spacing-sm);
+}
+
+.leadr-score-submitter__button {
+    margin-top: var(--leadr-spacing-md);
+    min-height: 40px;
+    background-color: var(--leadr-primary-color);
+    color: var(--leadr-text-inverse-color);
+    border-radius: var(--leadr-border-radius);
+    -unity-font-style: bold;
+    border-width: 0;
+}
+
+.leadr-score-submitter__button:hover {
+    background-color: var(--leadr-primary-hover-color);
+}
+
+.leadr-score-submitter__button:disabled {
+    background-color: var(--leadr-border-color);
+    color: var(--leadr-text-muted-color);
+}
+
+.leadr-score-submitter__feedback {
+    margin-top: var(--leadr-spacing-md);
+    padding: var(--leadr-spacing-sm);
+    border-radius: var(--leadr-border-radius);
+}
+
+/* Success feedback */
+.leadr-score-submitter--state-success .leadr-score-submitter__feedback {
+    background-color: #D4EDDA;
+    border-color: var(--leadr-secondary-color);
+    border-width: var(--leadr-border-width);
+}
+
+.leadr-score-submitter--state-success .leadr-score-submitter__feedback Label {
+    color: #155724;
+}
+
+/* Error feedback */
+.leadr-score-submitter--state-error .leadr-score-submitter__feedback {
+    background-color: #F8D7DA;
+    border-color: var(--leadr-error-color);
+    border-width: var(--leadr-border-width);
+}
+
+.leadr-score-submitter--state-error .leadr-score-submitter__feedback Label {
+    color: #721C24;
+}
