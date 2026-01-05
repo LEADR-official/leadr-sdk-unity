@@ -1,7 +1,7 @@
 # LEADR Unity SDK
 
 [![Unity 2020.3+](https://img.shields.io/badge/Unity-2020.3%2B-blue)](https://unity.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Add beautiful cross-platform leaderboards to your game in minutes.
 
