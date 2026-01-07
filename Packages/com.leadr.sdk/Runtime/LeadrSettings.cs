@@ -50,13 +50,27 @@ namespace Leadr
         public bool DebugLogging => debugLogging;
 
         /// <summary>
-        /// Validates the settings and logs errors for missing required values.
+        /// Validates the settings and throws if invalid.
         /// </summary>
+        /// <exception cref="System.ArgumentException">Thrown when settings are invalid.</exception>
         public void Validate()
         {
             if (string.IsNullOrEmpty(gameId))
             {
-                Debug.LogError("[LEADR] GameId is required in LeadrSettings");
+                throw new System.ArgumentException("GameId is required in LeadrSettings");
+            }
+
+            if (!string.IsNullOrEmpty(baseUrl))
+            {
+                if (!baseUrl.StartsWith("http://") && !baseUrl.StartsWith("https://"))
+                {
+                    throw new System.ArgumentException($"Invalid BaseUrl '{baseUrl}': must start with http:// or https://");
+                }
+
+                if (!System.Uri.TryCreate(baseUrl, System.UriKind.Absolute, out _))
+                {
+                    throw new System.ArgumentException($"Invalid BaseUrl '{baseUrl}': not a valid URL");
+                }
             }
         }
     }
