@@ -22,9 +22,9 @@ namespace Leadr
         /// <summary>
         /// API base URL. Only change this for self-hosted LEADR instances.
         /// </summary>
-        [Tooltip("API base URL (default: https://api.leadrcloud.com/v1/)")]
+        [Tooltip("API base URL (default: https://api.leadrcloud.com)")]
         [SerializeField]
-        private string baseUrl = "https://api.leadrcloud.com/v1/";
+        private string baseUrl = "https://api.leadrcloud.com";
 
         /// <summary>
         /// When enabled, logs HTTP requests and auth events to the console.
@@ -42,7 +42,7 @@ namespace Leadr
         /// <summary>
         /// Gets the API base URL, defaulting to the LEADR cloud if not set.
         /// </summary>
-        public string BaseUrl => string.IsNullOrEmpty(baseUrl) ? "https://api.leadrcloud.com/v1/" : baseUrl;
+        public string BaseUrl => string.IsNullOrEmpty(baseUrl) ? "https://api.leadrcloud.com" : baseUrl;
 
         /// <summary>
         /// Gets whether debug logging is enabled.
