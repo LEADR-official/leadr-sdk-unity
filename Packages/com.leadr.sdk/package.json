@@ -1,6 +1,6 @@
 {
   "name": "com.leadr.sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "LEADR Unity SDK",
   "description": "Unity SDK for LEADR leaderboard service",
   "unity": "2020.3",
