@@ -491,18 +491,14 @@ namespace Leadr.UI
                 return;
             }
 
-            int baseRank = (m_CurrentPageNumber - 1) * m_ScoresPerPage + 1;
-
             foreach (var score in m_CurrentPage.Items)
             {
                 var entry = new LeadrScoreEntry();
-                entry.SetScore(baseRank, score);
+                entry.SetScore(score.Rank, score);
                 entry.Clicked += OnScoreEntryClicked;
 
                 m_ListContainer.Add(entry);
                 m_ScoreEntries.Add(entry);
-
-                baseRank++;
             }
 
             m_ScrollView.scrollOffset = Vector2.zero;

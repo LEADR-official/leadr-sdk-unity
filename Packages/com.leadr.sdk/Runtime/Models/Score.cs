@@ -71,6 +71,20 @@ namespace Leadr.Models
         /// </summary>
         public DateTime UpdatedAt { get; private set; }
 
+        /// <summary>
+        /// Gets the rank position of this score on the leaderboard (1-indexed).
+        /// </summary>
+        public int Rank { get; private set; }
+
+        /// <summary>
+        /// Gets whether this is a placeholder score used for context in "around" queries.
+        /// </summary>
+        /// <remarks>
+        /// When fetching scores with <c>aroundScoreId</c> or <c>aroundScoreValue</c>,
+        /// the API may include placeholder scores to provide context around the target.
+        /// </remarks>
+        public bool IsPlaceholder { get; private set; }
+
         internal static Score FromJson(Dictionary<string, object> json)
         {
             if (json == null)
@@ -87,7 +101,9 @@ namespace Leadr.Models
                 ValueDisplay = json.GetString("value_display"),
                 Metadata = json.GetDict("metadata"),
                 CreatedAt = json.GetDateTimeRequired("created_at"),
-                UpdatedAt = json.GetDateTimeRequired("updated_at")
+                UpdatedAt = json.GetDateTimeRequired("updated_at"),
+                Rank = json.GetInt("rank"),
+                IsPlaceholder = json.GetBool("is_placeholder")
             };
         }
     }

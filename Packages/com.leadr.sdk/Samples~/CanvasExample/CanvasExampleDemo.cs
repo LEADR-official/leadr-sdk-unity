@@ -260,7 +260,6 @@ namespace Leadr.Samples.CanvasExample
                 return;
             }
 
-            int rank = 1;
             foreach (var score in page.Items)
             {
                 var entry = Instantiate(scoreEntryPrefab, scoreListContainer);
@@ -268,7 +267,7 @@ namespace Leadr.Samples.CanvasExample
 
                 if (entryUI != null)
                 {
-                    entryUI.SetScore(rank, score);
+                    entryUI.SetScore(score.Rank, score);
                 }
                 else
                 {
@@ -280,11 +279,9 @@ namespace Leadr.Samples.CanvasExample
                             ? score.ValueDisplay
                             : score.Value.ToString("N0");
 
-                        text.text = $"{rank}. {score.PlayerName} - {displayValue}";
+                        text.text = $"{score.Rank}. {score.PlayerName} - {displayValue}";
                     }
                 }
-
-                rank++;
             }
         }
 

@@ -249,23 +249,37 @@ namespace Leadr
         /// Optional sort string (e.g., "value:desc,created_at:desc").
         /// If null, uses the board's default sort direction.
         /// </param>
+        /// <param name="aroundScoreId">
+        /// Optional score ID to center results around (e.g., "scr_abc123...").
+        /// Cannot be used with <paramref name="aroundScoreValue"/>.
+        /// </param>
+        /// <param name="aroundScoreValue">
+        /// Optional score value to center results around.
+        /// Cannot be used with <paramref name="aroundScoreId"/>.
+        /// </param>
         /// <returns>A result containing the paginated scores or an error.</returns>
         /// <remarks>
         /// Use <see cref="PagedResult{T}.NextPageAsync"/> to fetch additional pages.
+        /// When using <paramref name="aroundScoreId"/> or <paramref name="aroundScoreValue"/>,
+        /// scores will be centered around the specified target with context above and below.
         /// </remarks>
         public async Task<LeadrResult<PagedResult<Score>>> GetScoresAsync(
             string boardId,
             int limit = 20,
-            string sort = null)
+            string sort = null,
+            string aroundScoreId = null,
+            double? aroundScoreValue = null)
         {
-            return await GetScoresInternalAsync(boardId, limit, sort, null);
+            return await GetScoresInternalAsync(boardId, limit, sort, null, aroundScoreId, aroundScoreValue);
         }
 
         private async Task<LeadrResult<PagedResult<Score>>> GetScoresInternalAsync(
             string boardId,
             int limit,
             string sort,
-            string cursor)
+            string cursor,
+            string aroundScoreId = null,
+            double? aroundScoreValue = null)
         {
             EnsureInitialized();
 
@@ -273,6 +287,19 @@ namespace Leadr
             {
                 return LeadrResult<PagedResult<Score>>.Failure(
                     0, "invalid_argument", "boardId is required");
+            }
+
+            // Validate mutual exclusivity
+            if (!string.IsNullOrEmpty(aroundScoreId) && aroundScoreValue.HasValue)
+            {
+                return LeadrResult<PagedResult<Score>>.Failure(
+                    0, "invalid_argument", "aroundScoreId and aroundScoreValue cannot both be specified");
+            }
+
+            if (!string.IsNullOrEmpty(cursor) && (!string.IsNullOrEmpty(aroundScoreId) || aroundScoreValue.HasValue))
+            {
+                return LeadrResult<PagedResult<Score>>.Failure(
+                    0, "invalid_argument", "around parameters cannot be used with cursor pagination");
             }
 
             var endpoint = $"/v1/client/scores?board_id={Uri.EscapeDataString(boardId)}&limit={limit}";
@@ -287,12 +314,43 @@ namespace Leadr
                 endpoint += $"&cursor={Uri.EscapeDataString(cursor)}";
             }
 
+            if (!string.IsNullOrEmpty(aroundScoreId))
+            {
+                endpoint += $"&around_score_id={Uri.EscapeDataString(aroundScoreId)}";
+            }
+
+            if (aroundScoreValue.HasValue)
+            {
+                endpoint += $"&around_score_value={aroundScoreValue.Value}";
+            }
+
             return await authManager.ExecuteAuthenticatedAsync(
                 headers => httpClient.GetAsync(endpoint, headers),
                 json => PagedResult<Score>.FromJson(
                     json,
                     Score.FromJson,
                     c => GetScoresInternalAsync(boardId, limit, sort, c)));
+        }
+
+        /// <summary>
+        /// Fetches a single score by its ID.
+        /// </summary>
+        /// <param name="scoreId">The score ID (e.g., "scr_abc123...").</param>
+        /// <returns>A result containing the score or an error.</returns>
+        public async Task<LeadrResult<Score>> GetScoreAsync(string scoreId)
+        {
+            EnsureInitialized();
+
+            if (string.IsNullOrEmpty(scoreId))
+            {
+                return LeadrResult<Score>.Failure(0, "invalid_argument", "scoreId is required");
+            }
+
+            var endpoint = $"/v1/client/scores/{Uri.EscapeDataString(scoreId)}";
+
+            return await authManager.ExecuteAuthenticatedAsync(
+                headers => httpClient.GetAsync(endpoint, headers),
+                Score.FromJson);
         }
 
         /// <summary>
