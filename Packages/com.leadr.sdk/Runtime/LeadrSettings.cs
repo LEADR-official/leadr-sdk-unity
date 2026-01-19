@@ -35,6 +35,14 @@ namespace Leadr
         private bool debugLogging = false;
 
         /// <summary>
+        /// When enabled, scores submitted during this session are marked as test data.
+        /// Test scores are not included in production leaderboards.
+        /// </summary>
+        [Tooltip("Enable test mode - scores will be marked as test data")]
+        [SerializeField]
+        private bool testMode = false;
+
+        /// <summary>
         /// Gets the configured Game ID.
         /// </summary>
         public string GameId => gameId;
@@ -48,6 +56,11 @@ namespace Leadr
         /// Gets whether debug logging is enabled.
         /// </summary>
         public bool DebugLogging => debugLogging;
+
+        /// <summary>
+        /// Gets whether test mode is enabled.
+        /// </summary>
+        public bool TestMode => testMode;
 
         /// <summary>
         /// Validates the settings and throws if invalid.

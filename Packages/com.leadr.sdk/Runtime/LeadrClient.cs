@@ -44,6 +44,7 @@ namespace Leadr
         private AuthManager authManager;
         private string gameId;
         private bool debugLogging;
+        private bool testMode;
         private bool isInitialized;
 
         /// <summary>
@@ -110,7 +111,7 @@ namespace Leadr
             }
 
             settings.Validate();
-            Initialize(settings.GameId, settings.BaseUrl, settings.DebugLogging);
+            Initialize(settings.GameId, settings.BaseUrl, settings.DebugLogging, settings.TestMode);
         }
 
         /// <summary>
@@ -126,10 +127,10 @@ namespace Leadr
         /// </remarks>
         public void Initialize(string gameId, string baseUrl = null)
         {
-            Initialize(gameId, baseUrl, false);
+            Initialize(gameId, baseUrl, debugLogging: false, testMode: false);
         }
 
-        private void Initialize(string gameId, string baseUrl, bool debugLogging)
+        private void Initialize(string gameId, string baseUrl, bool debugLogging, bool testMode)
         {
             if (string.IsNullOrEmpty(gameId))
             {
@@ -139,10 +140,11 @@ namespace Leadr
 
             this.gameId = gameId;
             this.debugLogging = debugLogging;
+            this.testMode = testMode;
 
             var url = string.IsNullOrEmpty(baseUrl) ? "https://api.leadrcloud.com/v1/" : baseUrl;
             httpClient = new HttpClient(url, debugLogging);
-            authManager = new AuthManager(httpClient, gameId, debugLogging);
+            authManager = new AuthManager(httpClient, gameId, debugLogging, testMode);
             isInitialized = true;
 
             if (debugLogging)

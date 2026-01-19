@@ -12,15 +12,17 @@ namespace Leadr.Internal
         private readonly HttpClient httpClient;
         private readonly string gameId;
         private readonly bool debugLogging;
+        private readonly bool testMode;
         private readonly SemaphoreSlim refreshLock = new SemaphoreSlim(1, 1);
 
         private static readonly TimeSpan RefreshThreshold = TimeSpan.FromMinutes(2);
 
-        public AuthManager(HttpClient httpClient, string gameId, bool debugLogging)
+        public AuthManager(HttpClient httpClient, string gameId, bool debugLogging, bool testMode)
         {
             this.httpClient = httpClient;
             this.gameId = gameId;
             this.debugLogging = debugLogging;
+            this.testMode = testMode;
         }
 
         public async Task<LeadrResult<Session>> StartSessionAsync()
@@ -32,6 +34,11 @@ namespace Leadr.Internal
                 { "game_id", gameId },
                 { "client_fingerprint", fingerprint }
             };
+
+            if (testMode)
+            {
+                body["test_mode"] = true;
+            }
 
             var response = await httpClient.PostAsync("/v1/client/sessions", body);
 
@@ -55,7 +62,11 @@ namespace Leadr.Internal
             var expiresAt = DateTime.UtcNow.AddSeconds(session.ExpiresIn);
             TokenStorage.SaveTokens(session.AccessToken, session.RefreshToken, expiresAt);
 
-            if (debugLogging)
+            if (testMode)
+            {
+                Debug.LogWarning("[LEADR] TEST MODE ACTIVE - Scores will be marked as test data");
+            }
+            else if (debugLogging)
             {
                 Debug.Log("[LEADR] Session started");
             }

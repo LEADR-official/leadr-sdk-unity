@@ -11,9 +11,6 @@ Add beautiful cross-platform leaderboards to your game in minutes.
 
 - **Drop-in UI Components** - Pre-built leaderboard and submission forms to get you started
 - **Anti-cheat Protection** - Server-side validation and rate limiting
-- **Seasons & Time Windows** - Weekly, monthly, or custom periods
-- **Rich Metadata** - Attach custom data to every score
-- **Web Views** - Shareable leaderboard pages for each board
 - **Async/Await** - Modern Unity async patterns
 
 ## Requirements
@@ -29,7 +26,7 @@ Add beautiful cross-platform leaderboards to your game in minutes.
 
 ## Quick Start
 
-1. **Get your Game ID**: Visit our [Get Started](https://docs.leadr.gg/latest/quick_start/) page to download the CLI and create your account
+1. **Get your Game ID**: Visit our [Get Started](https://docs.leadr.gg/latest/quick-start/) page to download the CLI and create your account
 2. **Create Settings**: In Unity, go to `Assets > Create > LEADR > Settings` and enter your Game ID
 3. **Import a Sample**: In Package Manager, expand "Samples" and import **Basic Integration**
 4. **Configure & Run**: Assign your Settings asset and board slug, then enter Play mode and check the console output
@@ -73,7 +70,3 @@ When developing/testing locally (ie against `http://localhost:3000`):
 - [Documentation](https://docs.leadr.gg)
 - [Discord Community](https://discord.gg/RMUukcAxSZ)
 - [Report Issues](https://github.com/LEADR-Official/leadr-sdk-unity/issues)
-
-## License
-
-Apache v2 License - see [LICENSE](LICENSE) for details.

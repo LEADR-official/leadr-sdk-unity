@@ -85,6 +85,11 @@ namespace Leadr.Models
         /// </remarks>
         public bool IsPlaceholder { get; private set; }
 
+        /// <summary>
+        /// Gets whether this score was submitted during a test session.
+        /// </summary>
+        public bool IsTest { get; private set; }
+
         internal static Score FromJson(Dictionary<string, object> json)
         {
             if (json == null)
@@ -103,7 +108,8 @@ namespace Leadr.Models
                 CreatedAt = json.GetDateTimeRequired("created_at"),
                 UpdatedAt = json.GetDateTimeRequired("updated_at"),
                 Rank = json.GetInt("rank"),
-                IsPlaceholder = json.GetBool("is_placeholder")
+                IsPlaceholder = json.GetBool("is_placeholder"),
+                IsTest = json.GetBool("is_test")
             };
         }
     }
