@@ -9,6 +9,8 @@ namespace Leadr.Internal
 {
     internal class HttpClient
     {
+        private const int TimeoutSeconds = 30;
+
         private readonly string baseUrl;
         private readonly bool debugLogging;
 
@@ -50,6 +52,8 @@ namespace Leadr.Internal
 
             using (var request = new UnityWebRequest(url, method))
             {
+                request.timeout = TimeoutSeconds;
+
                 if (!string.IsNullOrEmpty(jsonBody))
                 {
                     var bodyBytes = Encoding.UTF8.GetBytes(jsonBody);
@@ -78,11 +82,15 @@ namespace Leadr.Internal
 
                 var elapsed = (DateTime.UtcNow - startTime).TotalMilliseconds;
                 var responseBody = request.downloadHandler?.text;
+                var isTimeout = request.result == UnityWebRequest.Result.ConnectionError
+                    && request.error != null
+                    && request.error.Contains("Request timeout");
                 var response = new HttpResponse(
                     (int)request.responseCode,
                     responseBody,
                     request.result == UnityWebRequest.Result.Success ||
-                    request.result == UnityWebRequest.Result.ProtocolError);
+                    request.result == UnityWebRequest.Result.ProtocolError,
+                    isTimeout);
 
                 if (debugLogging)
                 {
@@ -150,12 +158,14 @@ namespace Leadr.Internal
         public int StatusCode { get; }
         public string Body { get; }
         public bool IsNetworkSuccess { get; }
+        public bool IsTimeout { get; }
 
-        public HttpResponse(int statusCode, string body, bool isNetworkSuccess)
+        public HttpResponse(int statusCode, string body, bool isNetworkSuccess, bool isTimeout = false)
         {
             StatusCode = statusCode;
             Body = body;
             IsNetworkSuccess = isNetworkSuccess;
+            IsTimeout = isTimeout;
         }
 
         public bool IsSuccess => StatusCode >= 200 && StatusCode < 300;
@@ -170,6 +180,9 @@ namespace Leadr.Internal
 
         public LeadrError ToError()
         {
+            if (IsTimeout)
+                return new LeadrError(0, "timeout", "Request timed out");
+
             if (StatusCode == 0)
                 return new LeadrError(0, "network_error", "Network request failed");
 
