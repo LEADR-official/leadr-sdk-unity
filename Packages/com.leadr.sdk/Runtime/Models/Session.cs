@@ -5,7 +5,7 @@ using Leadr.Internal;
 namespace Leadr.Models
 {
     /// <summary>
-    /// Represents an authenticated device session with the LEADR API.
+    /// Represents an authenticated identity session with the LEADR API.
     /// </summary>
     /// <remarks>
     /// Sessions are created automatically when needed. You typically don't need
@@ -15,9 +15,14 @@ namespace Leadr.Models
     public class Session
     {
         /// <summary>
-        /// Gets the unique device identifier assigned by LEADR.
+        /// Gets the unique identity identifier assigned by LEADR (e.g., "ide_abc123...").
         /// </summary>
-        public string DeviceId { get; private set; }
+        public string IdentityId { get; private set; }
+
+        /// <summary>
+        /// Gets the identity kind (Device, Steam, or Custom).
+        /// </summary>
+        public IdentityKind Kind { get; private set; }
 
         /// <summary>
         /// Gets the game ID this session is authenticated for.
@@ -74,7 +79,8 @@ namespace Leadr.Models
 
             return new Session
             {
-                DeviceId = json.GetString("id"),
+                IdentityId = json.GetString("identity_id"),
+                Kind = ParseIdentityKind(json.GetString("kind")),
                 GameId = json.GetString("game_id"),
                 AccountId = json.GetString("account_id"),
                 ClientFingerprint = json.GetString("client_fingerprint"),
@@ -86,6 +92,16 @@ namespace Leadr.Models
                 LastSeenAt = json.GetDateTime("last_seen_at") ?? DateTime.MinValue,
                 AccessToken = json.GetString("access_token"),
                 RefreshToken = json.GetString("refresh_token")
+            };
+        }
+
+        private static IdentityKind ParseIdentityKind(string value)
+        {
+            return value switch
+            {
+                "STEAM" => IdentityKind.Steam,
+                "CUSTOM" => IdentityKind.Custom,
+                _ => IdentityKind.Device
             };
         }
     }

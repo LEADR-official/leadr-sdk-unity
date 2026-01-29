@@ -65,23 +65,14 @@ namespace Leadr.Models
         public bool IsPublished { get; private set; }
 
         /// <summary>
-        /// Gets the sort direction for scores: "ascending" or "descending".
+        /// Gets the sort direction for scores.
         /// </summary>
-        /// <remarks>
-        /// "descending" means higher scores rank first (typical for points).
-        /// "ascending" means lower scores rank first (typical for time-based).
-        /// </remarks>
-        public string SortDirection { get; private set; }
+        public SortDirection SortDirection { get; private set; }
 
         /// <summary>
-        /// Gets the score keeping strategy: "all", "highest", or "latest".
+        /// Gets the score keeping strategy (RUN_IDENTITY boards only).
         /// </summary>
-        /// <remarks>
-        /// - "all": Keep all scores from each player
-        /// - "highest": Keep only each player's best score
-        /// - "latest": Keep only each player's most recent score
-        /// </remarks>
-        public string KeepStrategy { get; private set; }
+        public KeepStrategy KeepStrategy { get; private set; }
 
         /// <summary>
         /// Gets the list of tags associated with this board.
@@ -113,6 +104,26 @@ namespace Leadr.Models
         /// </summary>
         public DateTime UpdatedAt { get; private set; }
 
+        /// <summary>
+        /// Gets the board type determining how scores are tracked.
+        /// </summary>
+        /// <remarks>
+        /// - RunIdentity: One entry per identity, uses keep_strategy (BEST, LATEST, FIRST)
+        /// - RunRuns: Every submission ranked (arcade-style)
+        /// - Counter: Cumulative deltas (XP, wins)
+        /// - Ratio: Derived from two boards (win rate, K/D ratio)
+        /// </remarks>
+        public BoardType Type { get; private set; }
+
+        /// <summary>
+        /// Gets the ratio configuration for RATIO boards. Null for other board types.
+        /// </summary>
+        /// <remarks>
+        /// Contains keys: numerator_board_id, denominator_board_id, zero_denominator_policy,
+        /// min_denominator, min_numerator, scale, display, decimals, tie_breaker.
+        /// </remarks>
+        public Dictionary<string, object> RatioConfig { get; private set; }
+
         internal static Board FromJson(Dictionary<string, object> json)
         {
             if (json == null)
@@ -130,14 +141,48 @@ namespace Leadr.Models
                 Unit = json.GetString("unit"),
                 IsActive = json.GetBool("is_active"),
                 IsPublished = json.GetBool("is_published"),
-                SortDirection = json.GetString("sort_direction"),
-                KeepStrategy = json.GetString("keep_strategy"),
+                SortDirection = ParseSortDirection(json.GetString("sort_direction")),
+                KeepStrategy = ParseKeepStrategy(json.GetString("keep_strategy")),
                 Tags = json.GetStringList("tags"),
                 Description = json.GetString("description"),
                 StartsAt = json.GetDateTime("starts_at"),
                 EndsAt = json.GetDateTime("ends_at"),
                 CreatedAt = json.GetDateTimeRequired("created_at"),
-                UpdatedAt = json.GetDateTimeRequired("updated_at")
+                UpdatedAt = json.GetDateTimeRequired("updated_at"),
+                Type = ParseBoardType(json.GetString("board_type")),
+                RatioConfig = json.GetDict("ratio_config")
+            };
+        }
+
+        private static BoardType ParseBoardType(string value)
+        {
+            return value switch
+            {
+                "RUN_IDENTITY" => BoardType.RunIdentity,
+                "RUN_RUNS" => BoardType.RunRuns,
+                "COUNTER" => BoardType.Counter,
+                "RATIO" => BoardType.Ratio,
+                _ => BoardType.RunIdentity
+            };
+        }
+
+        private static SortDirection ParseSortDirection(string value)
+        {
+            return value switch
+            {
+                "ASCENDING" => SortDirection.Ascending,
+                _ => SortDirection.Descending
+            };
+        }
+
+        private static KeepStrategy ParseKeepStrategy(string value)
+        {
+            return value switch
+            {
+                "FIRST" => KeepStrategy.First,
+                "BEST" => KeepStrategy.Best,
+                "LATEST" => KeepStrategy.Latest,
+                _ => KeepStrategy.NA
             };
         }
     }
