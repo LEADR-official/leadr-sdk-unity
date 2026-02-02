@@ -62,6 +62,16 @@ namespace Leadr.Internal
 
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("LEADR-Client", ClientInfo.LeadrClientHeader);
+
+                try
+                {
+                    request.SetRequestHeader("User-Agent", ClientInfo.UserAgentHeader);
+                }
+                catch (System.InvalidOperationException)
+                {
+                    // User-Agent cannot be set on some platforms; LEADR-Client is sufficient.
+                }
 
                 if (headers != null)
                 {

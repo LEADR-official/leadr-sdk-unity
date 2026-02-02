@@ -82,12 +82,12 @@ namespace Leadr.Internal
                 return LeadrResult<bool>.Failure(0, "no_refresh_token", "No refresh token available");
             }
 
-            var headers = new Dictionary<string, string>
+            var body = new Dictionary<string, object>
             {
-                { "Authorization", $"Bearer {refreshToken}" }
+                { "refresh_token", refreshToken }
             };
 
-            var response = await httpClient.PostAsync("/v1/client/sessions/refresh", null, headers);
+            var response = await httpClient.PostAsync("/v1/client/sessions/refresh", body);
 
             if (!response.IsSuccess)
             {
