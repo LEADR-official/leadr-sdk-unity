@@ -81,6 +81,14 @@ public class LeadrDemo : MonoBehaviour
             Debug.Log($"Score submitted! Rank: #{submitResult.Data.Rank}");
         else
             Debug.LogError($"Error: {submitResult.Error}");
+
+        // Get your own scores for a board
+        var myScoresResult = await LeadrClient.Instance.GetMyScoresAsync("brd_your_board_id");
+        if (myScoresResult.IsSuccess)
+        {
+            foreach (var score in myScoresResult.Data.Items)
+                Debug.Log($"My score: {score.Value}");
+        }
     }
 }
 ```

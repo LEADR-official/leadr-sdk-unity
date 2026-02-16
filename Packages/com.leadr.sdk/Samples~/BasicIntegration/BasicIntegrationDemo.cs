@@ -10,6 +10,7 @@ namespace Leadr.Samples.BasicIntegration
     /// - Initialize the LeadrClient
     /// - Fetch a board by slug
     /// - Fetch scores for that board
+    /// - Fetch the current player's own scores
     /// </summary>
     public class BasicIntegrationDemo : MonoBehaviour
     {
@@ -72,6 +73,28 @@ namespace Leadr.Samples.BasicIntegration
                     : score.Value.ToString("N0");
                 Debug.Log($"  {rank}. {score.PlayerName}: {display}");
                 rank++;
+            }
+
+            // Fetch the current player's own scores
+            Debug.Log("[BasicDemo] Fetching my scores...");
+            var myScoresResult = await LeadrClient.Instance.GetMyScoresAsync(fetchedBoard.Id);
+
+            if (myScoresResult.IsSuccess)
+            {
+                var myScores = myScoresResult.Data;
+                Debug.Log($"[BasicDemo] Found {myScores.Items.Count} of my scores on this board:");
+
+                foreach (var myScore in myScores.Items)
+                {
+                    var display = !string.IsNullOrEmpty(myScore.ValueDisplay)
+                        ? myScore.ValueDisplay
+                        : myScore.Value.ToString("N0");
+                    Debug.Log($"  - {display} (submitted {myScore.CreatedAt:g})");
+                }
+            }
+            else
+            {
+                Debug.Log($"[BasicDemo] Could not fetch my scores: {myScoresResult.Error}");
             }
         }
     }

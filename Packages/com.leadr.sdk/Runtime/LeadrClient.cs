@@ -335,6 +335,78 @@ namespace Leadr
         }
 
         /// <summary>
+        /// Fetches a paginated list of scores submitted by the current authenticated identity.
+        /// </summary>
+        /// <param name="boardId">The board ID (e.g., "brd_abc123...").</param>
+        /// <param name="limit">Maximum scores per page (1-100, default 20).</param>
+        /// <param name="sort">
+        /// Optional sort string (e.g., "value:desc,created_at:desc").
+        /// If null, uses default sorting.
+        /// </param>
+        /// <returns>A result containing the paginated scores or an error.</returns>
+        /// <remarks>
+        /// <para>
+        /// This method returns only scores belonging to the current device/identity.
+        /// The identity is determined automatically from the authenticated session.
+        /// </para>
+        /// <para>
+        /// Use <see cref="PagedResult{T}.NextPageAsync"/> to fetch additional pages.
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // Get my scores for a specific board
+        /// var myScores = await LeadrClient.Instance.GetMyScoresAsync("brd_abc123");
+        /// if (myScores.IsSuccess)
+        /// {
+        ///     foreach (var score in myScores.Data.Items)
+        ///         Debug.Log($"My score: {score.Value}");
+        /// }
+        /// </code>
+        /// </example>
+        public async Task<LeadrResult<PagedResult<Score>>> GetMyScoresAsync(
+            string boardId,
+            int limit = 20,
+            string sort = null)
+        {
+            return await GetMyScoresInternalAsync(boardId, limit, sort, null);
+        }
+
+        private async Task<LeadrResult<PagedResult<Score>>> GetMyScoresInternalAsync(
+            string boardId,
+            int limit,
+            string sort,
+            string cursor)
+        {
+            EnsureInitialized();
+
+            if (string.IsNullOrEmpty(boardId))
+            {
+                return LeadrResult<PagedResult<Score>>.Failure(
+                    0, "invalid_argument", "boardId is required");
+            }
+
+            var endpoint = $"/v1/client/scores?board_id={Uri.EscapeDataString(boardId)}&identity_id=me&limit={limit}";
+
+            if (!string.IsNullOrEmpty(sort))
+            {
+                endpoint += $"&sort={Uri.EscapeDataString(sort)}";
+            }
+
+            if (!string.IsNullOrEmpty(cursor))
+            {
+                endpoint += $"&cursor={Uri.EscapeDataString(cursor)}";
+            }
+
+            return await authManager.ExecuteAuthenticatedAsync(
+                headers => httpClient.GetAsync(endpoint, headers),
+                json => PagedResult<Score>.FromJson(
+                    json,
+                    Score.FromJson,
+                    c => GetMyScoresInternalAsync(boardId, limit, sort, c)));
+        }
+
+        /// <summary>
         /// Fetches a single score by its ID.
         /// </summary>
         /// <param name="scoreId">The score ID (e.g., "scr_abc123...").</param>
