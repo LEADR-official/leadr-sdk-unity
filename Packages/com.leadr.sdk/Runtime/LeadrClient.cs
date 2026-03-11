@@ -459,7 +459,7 @@ namespace Leadr
         /// </example>
         public async Task<LeadrResult<Score>> SubmitScoreAsync(
             string boardId,
-            long score,
+            double score,
             string playerName,
             string valueDisplay = null,
             Dictionary<string, object> metadata = null)

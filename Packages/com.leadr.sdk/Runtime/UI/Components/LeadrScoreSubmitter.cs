@@ -32,12 +32,12 @@ namespace Leadr.UI
         /// <summary>Gets the player name used.</summary>
         public string PlayerName { get; }
         /// <summary>Gets the score value submitted.</summary>
-        public long Value { get; }
+        public double Value { get; }
 
         /// <summary>
         /// Creates new score submitted event args.
         /// </summary>
-        public ScoreSubmittedEventArgs(Score score, string playerName, long value)
+        public ScoreSubmittedEventArgs(Score score, string playerName, double value)
         {
             Score = score;
             PlayerName = playerName;
@@ -100,7 +100,7 @@ namespace Leadr.UI
 
         // State
         private SubmitterState m_State = SubmitterState.Idle;
-        private long m_ScoreValue;
+        private double m_ScoreValue;
         private string m_ValueDisplay;
         private Dictionary<string, object> m_Metadata;
         private bool m_IsValid;
@@ -231,7 +231,7 @@ namespace Leadr.UI
         /// <summary>
         /// Gets or sets the score value.
         /// </summary>
-        public long ScoreValue
+        public double ScoreValue
         {
             get => m_ScoreValue;
             set
